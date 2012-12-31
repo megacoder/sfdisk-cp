@@ -1,0 +1,17 @@
+#!/bin/zsh
+USAGE="usage: ${0:t} /dev/in /dev/out"
+if [[ ${EUID} -ne 0 ]]; then
+	echo "Thou shalt be root!" >&2
+	exit 1
+fi
+if [[ $# -ne 2 ]]; then
+	echo "${USAGE}" >&2
+	exit 1
+fi
+FROM="${1}"
+TO="${2}"
+if [[ ! -b "${FROM}" || ! -b "${TO}" ]]; then
+	echo "Need to block devices!" >&2
+	exit 1
+fi
+/sbin/sfdisk -d "${FROM}" | tee /dev/tty | /sbin/sfdisk "${TO}"
